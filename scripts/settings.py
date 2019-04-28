@@ -1,11 +1,3 @@
-"""
-    Settings for running scripts
-"""
-
-#Source newspaper (Reforma or Universal)
-SOURCE_NEWSPAPER = 'El Universal (Mexico)'
-# SOURCE_NEWSPAPER = 'Reforma (Mexico)'
-# Each source = new dataframe? or everything together? Then SOURCE_NEWSPAPER should be a list
-
-#Number of sentences around target sentence to consider for sentiment analysis
-SENTENCE_BUFFER_WINDOW = 1
+version https://git-lfs.github.com/spec/v1
+oid sha256:3fc5276a085ab9b0af6a466a4c5d7f5e45616fdd9514def006c1557f00ec7cef
+size 366
