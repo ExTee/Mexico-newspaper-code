@@ -14,10 +14,6 @@ Articles gathered are those that contain either:
 - Abbreviation of agency
 - Name of minister in charge of agency
 
-## File description
-
-
-
 
 ## Compiled File description
 Stable articles have been compiled into `all_unstable_articles.csv` with the following attributes.
@@ -77,15 +73,7 @@ df = pd.read_pickle('./data/raw/all_unstable_articles.pkl')
 ```
 
 ## Running Sequence (as of Jan 15, 2019)
-1. Data deduplication and restructuring
 
-2. Anomaly Detection v2
-
-3. Sentiment analysis preprocessing (up to "Saving comprehensive dataframe to pickle")
-3.5 Obtain Keywords From HTML
-	(Step 3. uses the result from 3.5)
-
-4. Sentiment Analysis
 
 ## Contact
 Benjamin Bagozzi - [bagozzib@gmail.com](mailto:bagozzib@gmail.com)

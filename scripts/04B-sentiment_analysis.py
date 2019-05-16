@@ -1,5 +1,18 @@
 """
-    Sentiment analysis
+    Sentiment analysis.
+    
+    Class SentimentAnalyzer needs to be instantiated with the following:
+        - df : a dataframe in the format of input_standard_dataframe
+        - buffer: how many sentences around indentified sentence to take into account for sentiment analysis.
+        - clf : Sentiment Analyzer.
+            Requires this analyzer to have a function predict() which returns a double between 0 and 1.
+        - REGEXES: Dictionary of { Agency_name : REGEX_EXPRESSION }. 
+            This can be the same REGEX expression used to generate story_sentence_index.
+            This is used to remove any mention of agency during sentiment analysis.
+            
+    Outputs:
+        - article_sentiment_standard_dataframe (see readme) 
+    
 """
 
 import pandas as pd
@@ -11,24 +24,27 @@ tqdm.pandas()
 
 
 class SentimentAnalyzer():
-    def __init__(self, df = pd.read_pickle('../data/processed/df_comprehensive_REGEX.pkl'), buffer=settings.SENTENCE_BUFFER_WINDOW):
-        """
-        Initialize the Analyzer with a dataframe where:
-            each row : one article
-            columns : id source date title byline section length story story_sentences num_sentences story_sentence_index
-            additional columns: one column for each agency, with 1 indicating that agency is mentioned.
-        keywords:
-            Dictionary of regex expressions
-            
-        """
-        self.df = df[df['source'] == settings.SOURCE_NEWSPAPER]
-        self.clf = SentimentClassifier()
+    def __init__(
+        self, 
+        df = pd.read_pickle('../data/processed/df_comprehensive_REGEX.pkl'), 
+        buffer = settings.SENTENCE_BUFFER_WINDOW,
+        clf = SentimentClassifier(),
+        REGEXES = utils.REGEXES
+    ):
+
+#         self.df = df[df['source'] == settings.SOURCE_NEWSPAPER]
+        self.df = df
+        self.clf = clf
         self.buffer = buffer
-        self.REGEXES = utils.REGEXES
+        self.REGEXES = REGEXES
         
     def __series_wrapper_apply_buffer(self, series):
         """
         Private.
+        This function takes the story_sentence_index dictionary and removes duplicates when buffer is applied.
+        For example, if agency {PEMEX : [0,3,6,8,10]} was identified, and buffer = 1.
+        This function returns {PEMEX : [0,1,2,3,4,5,6,7,8,9,10]}
+        
         Returns a dictionary:
                 {
                     agency_1 : [sentence_idx_1, sentence_idx_2, ...]
@@ -69,14 +85,6 @@ class SentimentAnalyzer():
             -agency_name: name of agency
         """
         
-        # Apply buffer
-        
-#         start = max(0, sentence_idx - self.buffer)
-#         end = min(len(story_sentences) - 1, sentence_idx + self.buffer)
-        
-#         #Create our sample. The sample incorporates the neighborhood of our agency mention.
-#         #We're doing sentiment analysis on this sample
-#         sample = ' '.join(story_sentences[start:end+1]).lower()
 
         #Buffer already applied.
         sample = story_sentences[sentence_idx].lower()
