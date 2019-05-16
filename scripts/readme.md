@@ -46,3 +46,20 @@ This dataframe is the same as the Input Standard Dataframe, but with a few colum
 - `senti_per_agency`: same structure as `buffered_story_sentence_index`. However, each buffered sentence is converted to its sentiment score.
 - `senti_avg_per_agency` Each agency in `senti_per_agency` contains multiple buffered sentences. These sentences' sentiment scores are average.
 - `senti_full_article` sentiment of the entire article
+
+
+## Anomaly Standard Dataframe
+
+This dataframe contains all detected anomalies.
+
+Used for:
+- `scripts/06-Generate-HTMLS.py`
+
+`data/processed/anomaly_standard_dataframe.pkl`
+
+![img](https://i.imgur.com/jlURVbq.png)
+
+- `id` : Unique ID identifying anomaly
+- `Agency`: Agency name that corresponds to an anomaly
+- `Start Date`: Inclusive. Start date of a detected anomaly
+- `End Date`: Inclusive. End date of a detected anomaly

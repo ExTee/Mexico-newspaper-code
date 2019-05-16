@@ -3,7 +3,7 @@
     Assigns an index to articles and their corresponding anomaly
 """
 
-SENTIMENT_DATAFRAME = '../data/processed/all_article_sentiments_v2.pkl'
+SENTIMENT_DATAFRAME = '../data/processed/article_sentiment_standard_dataframe.pkl'
 ANOMALY_DATAFRAME = '../data/processed/new_anomaly_df.pkl'
 
 

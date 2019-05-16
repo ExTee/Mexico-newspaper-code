@@ -1,5 +1,16 @@
+"""
+    This script combines:
+        - Anomaly Standard dataframe
+        - Article level Sentiments
+        
+    Output:
+        - Generates a folder containing one HTML file for articles within each anomaly
+
+"""
 import pandas as pd
 from tqdm import tqdm
+from classifier import *
+tqdm.pandas()
 
 html_HEADER = """
 <HTML>
@@ -120,28 +131,76 @@ html_FOOTER = """
 </BODY></HTML>
 """
 
+SENTIMENT_DATAFRAME_PATH = '../data/processed/article_sentiment_standard_dataframe_Reforma.pkl'
+ANOMALY_DATAFRAME_PATH = '../data/processed/anomaly_standard_dataframe.pkl'
+HTML_OUTPUT_FOLDER_PATH = '../data/output_htmls'
+
+df_article_sentiment_standard_dataframe = pd.read_pickle(SENTIMENT_DATAFRAME_PATH) 
+df_anomaly_standard_dataframe = pd.read_pickle(ANOMALY_DATAFRAME_PATH)
+
+
+
+def combine_anomalies_and_sentiments():
+    """
+        Combines Articles with Sentiments and Anomalies.
+        Returns a dataframe containing all articles, their sentiments, and their associated anomaly.
+    
+    """
+    
+    cols = list(df_anomaly_standard_dataframe.columns.values)
+    df_anomaly_standard_dataframe.reset_index(inplace=True)
+    df_anomaly_standard_dataframe.columns = ['id'] + cols
+
+    #Load the pre-calculated sentiments
+
+
+
+    df_anomalies_only = pd.DataFrame()
+
+    def append_to_df(series):
+        start = series['Start Date']
+        end = series['End Date']
+        agency = series['Agency']
+
+        date_constraint = (df_article_sentiment_standard_dataframe['date'] >= start) & (df_article_sentiment_standard_dataframe['date'] <= end)
+        agency_constraint = (df_article_sentiment_standard_dataframe[agency] == 1)
+
+        #Select articles corresponding to an agency
+        _tmp = df_article_sentiment_standard_dataframe[date_constraint & agency_constraint]
+        #Indicate anomaly it belongs to
+        _tmp['anomaly_id'] = series.id 
+        return _tmp
+
+
+    for i in tqdm(range(df_anomaly_standard_dataframe.shape[0])):
+        df_anomalies_only = pd.concat([df_anomalies_only, append_to_df(df_anomaly_standard_dataframe.iloc[i,:])])
+
+    return df_anomalies_only
+
 
 
 #Reading dataframes
 
 #Dataframe containing sentiments of sentences
-df_sentiment_processed_anomalies = pd.read_pickle('../data/processed/sentiment_processed_anomalies_v3.pkl')
+df_sentiment_processed_anomalies = combine_anomalies_and_sentiments()
+# df_sentiment_processed_anomalies = pd.read_pickle('../data/processed/sentiment_processed_anomalies_v3.pkl')
 
-anomaly_information = pd.read_pickle('data/new_anomaly_df.pkl')
-cols = list(anomaly_information.columns.values)
-anomaly_information.reset_index(inplace=True)
-anomaly_information.columns = ['id'] + cols
-anomaly_information.head()
+# df_anomaly_standard_dataframe = ANOMALY_DATAFRAME_PATH
+# df_anomaly_standard_dataframe = pd.read_pickle('data/new_anomaly_df.pkl')
+# cols = list(df_anomaly_standard_dataframe.columns.values)
+# df_anomaly_standard_dataframe.reset_index(inplace=True)
+# df_anomaly_standard_dataframe.columns = ['id'] + cols
+# df_anomaly_standard_dataframe.head()
 
 #Loop through all anomalies detected
-for anomaly_id in tqdm(list(anomaly_information.id.unique())): 
-    _info = anomaly_information[anomaly_information['id'] == anomaly_id].iloc[0]
+for anomaly_id in tqdm(list(df_anomaly_standard_dataframe.id.unique())): 
+    _info = df_anomaly_standard_dataframe[df_anomaly_standard_dataframe['id'] == anomaly_id].iloc[0]
     start_date = _info['Start Date']
     end_date = _info['End Date']
     agency = _info['Agency']
     
     #Create new html file, write headers and date
-    with open(f'data/dataframe_for_aaron/output_htmls_v3/ANOMALY_{anomaly_id}.HTML','w') as f:
+    with open(f'{HTML_OUTPUT_FOLDER_PATH}/ANOMALY_{anomaly_id}.HTML','w') as f:
         f.write(html_HEADER)
         f.write(html_TITLE.format(agency))
         f.write("""<hr><br><center><SPAN CLASS="c22">Anomaly date: {} to {}</center><br><hr>""".format(start_date, end_date))
